@@ -1,10 +1,11 @@
-#include "ArvoreBinaria.h"
+#include "arvoreAVL.h"
 
 /*
 Estrutura da Arvore
 */
 struct NO{
     int info;
+    int altura;    // Altura da sub-arvore
     struct NO *esq;
     struct NO *dir;
 };
@@ -13,9 +14,9 @@ struct NO{
 /*
 Inicializando a arvore
 */
-ArvBin* cria_ArvBin(){
+ArvAVL* cria_ArvAVL(){
     
-    ArvBin* raiz = (ArvBin*) malloc(sizeof(ArvBin));
+    ArvAVL* raiz = (ArvAVL*) malloc(sizeof(ArvAVL));
     if( raiz != NULL )
         *raiz = NULL;
 
@@ -42,7 +43,7 @@ void libera_NO( struct NO* no){
 /*
 Matando a arvore
 */
-void libera_ArvBin(ArvBin* raiz){
+void libera_ArvAVL(ArvAVL* raiz){
     
     if(raiz == NULL)
         return;
@@ -55,7 +56,7 @@ void libera_ArvBin(ArvBin* raiz){
 /*
 Verificação se a arvore esta vazia
 */
-int estaVazia( ArvBin* raiz ){
+int estaVazia( ArvAVL* raiz ){
 
     if(raiz == NULL)
         return 0;
@@ -68,13 +69,13 @@ int estaVazia( ArvBin* raiz ){
 /*
 Identificando a altura da arvore
 */
-int altura_ArvBin( ArvBin *raiz ){
+int altura_ArvAVL( ArvAVL *raiz ){
 
     if( !estaVazia( raiz ) )
         return 0;
    
-    int alt_esq = altura_ArvBin(&((*raiz)->esq));
-    int alt_dir = altura_ArvBin(&((*raiz)->dir));
+    int alt_esq = altura_ArvAVL(&((*raiz)->esq));
+    int alt_dir = altura_ArvAVL(&((*raiz)->dir));
 
     if(alt_esq > alt_dir)
         return (alt_esq + 1);
@@ -86,13 +87,13 @@ int altura_ArvBin( ArvBin *raiz ){
 /*
 Numero total de nos da arvore
 */
-int totalNO_ArvBin( ArvBin *raiz ){
+int totalNO_ArvAVL( ArvAVL *raiz ){
     
     if( !estaVazia( raiz ) )
         return 0;
 
-    int alt_esq = totalNO_ArvBin(&((*raiz)->esq));
-    int alt_dir = totalNO_ArvBin(&((*raiz)->dir));
+    int alt_esq = totalNO_ArvAVL(&((*raiz)->esq));
+    int alt_dir = totalNO_ArvAVL(&((*raiz)->dir));
 
     return(alt_esq + alt_dir + 1);
 }
@@ -100,41 +101,41 @@ int totalNO_ArvBin( ArvBin *raiz ){
 /*
 Percorrendo arvore binaria em preordem
 */
-void preOrdem_ArvBin( ArvBin *raiz ){
+void preOrdem_ArvAVL( ArvAVL *raiz ){
     
     if( raiz == NULL )
         return;
     if( *raiz != NULL ){
         printf("%d\n", (*raiz)->info);
-        preOrdem_ArvBin(&((*raiz)->esq));
-        preOrdem_ArvBin(&((*raiz)->dir));
+        preOrdem_ArvAVL(&((*raiz)->esq));
+        preOrdem_ArvAVL(&((*raiz)->dir));
     }
 }
 
 /*
 Percorrendo arvore binaria em ordem
 */
-void emOrdem_ArvBin( ArvBin *raiz ){
+void emOrdem_ArvAVL( ArvAVL *raiz ){
     
     if( raiz == NULL )
         return;
     if( *raiz != NULL ){
-        emOrdem_ArvBin(&((*raiz)->esq));
+        emOrdem_ArvAVL(&((*raiz)->esq));
         printf("%d\n", (*raiz)->info);
-        emOrdem_ArvBin(&((*raiz)->dir));
+        emOrdem_ArvAVL(&((*raiz)->dir));
     }
 }
 
 /*
 Percorrendo arvore binaria em posordem
 */
-void posOrdem_ArvBin( ArvBin *raiz ){
+void posOrdem_ArvAVL( ArvAVL *raiz ){
     
     if( raiz == NULL )  //Arvore valida??
         return;
     if( *raiz != NULL ){ //Arvore vazia??
-        posOrdem_ArvBin(&((*raiz)->esq));
-        posOrdem_ArvBin(&((*raiz)->dir));
+        posOrdem_ArvAVL(&((*raiz)->esq));
+        posOrdem_ArvAVL(&((*raiz)->dir));
         printf("%d\n", (*raiz)->info);
     }
 }
@@ -142,7 +143,7 @@ void posOrdem_ArvBin( ArvBin *raiz ){
 /*
 Inserir valores na arvore binaria
 */
-int insere_ArvBin( ArvBin *raiz, int valor ){
+int insere_ArvAVL( ArvAVL *raiz, int valor ){
     
     if( raiz == NULL )  //Arvore valida??
         return 1;
@@ -187,7 +188,7 @@ int insere_ArvBin( ArvBin *raiz, int valor ){
 /*
 Removendo valores na arvore binaria
 */
-int remove_ArvBin( ArvBin *raiz, int valor ){
+int remove_ArvAVL( ArvAVL *raiz, int valor ){
     
     if( raiz == NULL )  //Arvore valida??
         return 1;
@@ -253,7 +254,7 @@ struct NO* remove_atual( struct NO* atual ){
 /*
 Busca um valor na arvore binaria
 */
-int consulta_ArvBin( ArvBin *raiz, int valor ){
+int consulta_ArvAVL( ArvAVL *raiz, int valor ){
     
     if( raiz == NULL )  //Arvore valida??
         return 1;
@@ -274,41 +275,102 @@ int consulta_ArvBin( ArvBin *raiz, int valor ){
 }
 
 /*
+Funçoes auxialiares para arvore AVL
+*/
+int altura_NO( struct NO* no ){
+    
+    if( no == NULL )
+        return -1;
+    else
+        return no->altura;
+}
+
+int fatorBalanceamento_NO( struct NO* no ){
+    return labs(altura_NO(no->esq) - altura_NO(no->dir));
+}
+
+int maior ( int x, int y ){
+    
+    if( x > y )
+        return x;
+    else
+        return y;
+}
+
+/*
+# Rotações de nós
+*/
+void RotacaoLL( ArvAVL *raiz ){
+
+    struct NO* no;
+    no = (*raiz)->esq;
+    (*raiz)->esq = no->dir;
+    no->dir = *raiz;
+    (*raiz)->altura = maior( altura_NO( (*raiz)->esq),
+                             altura_NO( (*raiz)->dir))
+                             + 1;
+    no->altura = maior(altura_NO(no->esq),
+                        (*raiz)->altura) + 1;
+    
+    *raiz = no;
+}
+
+void RotacaoRR( ArvAVL *raiz ){
+
+    struct NO* no;
+    no = (*raiz)->dir;
+    (*raiz)->dir = no->esq;
+    no->esq = *raiz;
+    (*raiz)->altura = maior( altura_NO( (*raiz)->esq),
+                             altura_NO( (*raiz)->dir))
+                             + 1;
+    no->altura = maior(altura_NO(no->dir),
+                        (*raiz)->altura) + 1;
+    
+    *raiz = no;
+}
+
+void RotacaoLR( ArvAVL *raiz ){
+    RotacaoRR(&(*raiz)->esq);
+    RotacaoLL(raiz);
+}
+
+/*
 MAIN
 */
 int main(){
     
     int ret;
 
-    ArvBin* raiz = cria_ArvBin();
+    ArvAVL* raiz = cria_ArvAVL();
     
     if( !estaVazia( raiz ) )
         printf("A arvore esta vazia!\n");
     else
         printf("A arvore NAO esta vazia!\n");
     
-    int altura = altura_ArvBin( raiz );
+    int altura = altura_ArvAVL( raiz );
 
     printf("Altura da arvore é: %i\n",altura);
 
-    int total_no = totalNO_ArvBin( raiz );
+    int total_no = totalNO_ArvAVL( raiz );
     printf("Numero de Nos total é: %i\n",total_no);
 
     int valor = 50;
     /* 
     Inserindo valor na arvore.
     */
-    ret = insere_ArvBin(raiz, valor);
+    ret = insere_ArvAVL(raiz, valor);
     if( !ret )
         printf("Inserção feita com sucesso!!\n");
     else
         printf("Erro na inserção. \nRET=%i\n",ret);
-    ret = insere_ArvBin(raiz, 20);
+    ret = insere_ArvAVL(raiz, 20);
     if( !ret )
         printf("Inserção feita com sucesso!!\n");
     else
         printf("Erro na inserção. \nRET=%i\n",ret);
-    ret = insere_ArvBin(raiz, 70);
+    ret = insere_ArvAVL(raiz, 70);
     if( !ret )
         printf("Inserção feita com sucesso!!\n");
     else
@@ -319,16 +381,16 @@ int main(){
     /* 
     Verificação do  valor inserido na arvore.
     */
-    ret = insere_ArvBin(raiz, valor);
+    ret = insere_ArvAVL(raiz, valor);
     if( !estaVazia( raiz ) )
         printf("A arvore esta vazia!\n");
     else
         printf("A arvore NAO esta vazia!\n");
     
-    altura = altura_ArvBin( raiz );
+    altura = altura_ArvAVL( raiz );
     printf("Altura da arvore é: %i\n",altura);
 
-    total_no = totalNO_ArvBin( raiz );
+    total_no = totalNO_ArvAVL( raiz );
     printf("Numero de Nos total é: %i\n",altura);
 
     /*
@@ -336,16 +398,16 @@ int main(){
     */
     printf("Percorrendo a arvore...\n");
     printf("Pre Ordem...\n");
-    preOrdem_ArvBin(raiz);
+    preOrdem_ArvAVL(raiz);
     printf("Em Ordem...\n");
-    emOrdem_ArvBin(raiz);
+    emOrdem_ArvAVL(raiz);
     printf("Pos Ordem...\n");
-    posOrdem_ArvBin(raiz);
+    posOrdem_ArvAVL(raiz);
 
     /*
     Verifica se o valor existe na arvore.
     */
-    ret = consulta_ArvBin( raiz, valor );
+    ret = consulta_ArvAVL( raiz, valor );
     if( !ret )
         printf("O valor %i existe na arvore!!\n",valor);
     else
@@ -355,10 +417,10 @@ int main(){
     Removendo No.
     */
     printf("Removendo No...\n");
-    ret = remove_ArvBin(raiz, valor);   
+    ret = remove_ArvAVL(raiz, valor);   
 
     printf("Liberando Arvore...\n");
-    libera_ArvBin(raiz);
+    libera_ArvAVL(raiz);
 
     //system("pause");
     return 0;

@@ -145,44 +145,58 @@ Inserir valores na arvore binaria
 */
 int insere_ArvAVL( ArvAVL *raiz, int valor ){
     
+    int res;
     if( raiz == NULL )  //Arvore valida??
         return 1;
 
-    struct NO* novo;
-    novo = (struct NO*) malloc(sizeof(struct NO));
+    if( *raiz == NULL ){ //Arvore vazia??
+        struct NO* novo;
+        novo = (struct NO*) malloc(sizeof(struct NO));
     
-    if( novo == NULL )
-        return 1;
+        if( novo == NULL )
+            return 1;
     
-    novo->info = valor;
-    novo->dir = NULL;
-    novo->esq = NULL;
+        novo->info = valor;
+        novo->altura = 0;
+        novo->dir = NULL;
+        novo->esq = NULL;
 
-    if( *raiz == NULL ) //Arvore vazia??
         *raiz = novo;
-    else{
-        struct NO* atual = *raiz;
-        struct NO* ant = NULL;
-        
-        while(atual != NULL){
-            ant = atual;
 
-            if( valor == atual->info ){
-                free(novo);
-                return 1;   //Elemento ja existe
-            }
-            if( valor > atual->info )
-                atual = atual->dir;
-            else
-                atual = atual->esq;
-        }
-
-        if( valor > ant->info )
-            ant->dir = novo;
-        else
-            ant->esq = novo;
+        return 0;
     }
-    return 0;
+    
+    struct NO* atual = *raiz;
+    
+    if( valor < atual->info ){
+        if( (res=insere_ArvAVL(&(atual->esq), valor)) == 1) {
+            if( fatorBalanceamento_NO( atual ) >= 2 ) {
+                if( valor < (*raiz)->esq->info ) {
+                    RotacaoLL(raiz);
+                }else{
+                    RotacaoLR(raiz);
+                }
+            }
+        }
+    }else{
+        if( valor > atual->info ){
+            if( (res=insere_ArvAVL(&(atual->dir), valor)) == 1) {
+                if( fatorBalanceamento_NO( atual ) >= 2 ) {
+                    if( (*raiz)->dir->info < valor ) {
+                        RotacaoRR(raiz);
+                    }else{
+                        RotacaoRL(raiz);
+                    }
+                }
+            }
+        }else{
+            printf("Valor duplicado!!\n");
+            return 1;
+        }
+    }
+    atual->altura = maior(altura_NO(atual->esq),
+                          altura_NO(atual->dir)) + 1;
+    return res;
 }
 
 /*
@@ -333,6 +347,11 @@ void RotacaoRR( ArvAVL *raiz ){
 void RotacaoLR( ArvAVL *raiz ){
     RotacaoRR(&(*raiz)->esq);
     RotacaoLL(raiz);
+}
+
+void RotacaoRL( ArvAVL *raiz ){
+    RotacaoLL(&(*raiz)->dir);
+    RotacaoRR(raiz);
 }
 
 /*

@@ -23,3 +23,5 @@ int maior( int x, int y );
 void RotacaoLL( ArvAVL *raiz );
 void RotacaoRR( ArvAVL *raiz );
 void RotacaoRL( ArvAVL *raiz );
+void RotacaoLR( ArvAVL *raiz );
+void RotacaoRL( ArvAVL *raiz );

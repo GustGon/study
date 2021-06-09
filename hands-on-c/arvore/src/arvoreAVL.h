@@ -25,3 +25,4 @@ void RotacaoRR( ArvAVL *raiz );
 void RotacaoRL( ArvAVL *raiz );
 void RotacaoLR( ArvAVL *raiz );
 void RotacaoRL( ArvAVL *raiz );
+struct NO* procuraMenor(struct NO* atual);

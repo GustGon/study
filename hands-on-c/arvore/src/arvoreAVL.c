@@ -206,36 +206,70 @@ int remove_ArvAVL( ArvAVL *raiz, int valor ){
     
     if( raiz == NULL )  //Arvore valida??
         return 1;
-
-     struct NO* atual = *raiz;
-     struct NO* ant = NULL;
-        
-     while(atual != NULL){
-
-        if( valor == atual->info ){
-            if( atual == *raiz )
-                *raiz = remove_atual(atual);
-            else{
-                if( ant->dir == atual )
-                    ant->dir = remove_atual(atual); //Novo nó a ser apontado
+    if( *raiz == NULL ) // Valor nao existe
+        return 1;
+    
+    int res;
+    if( valor < (*raiz)->info ){
+        if( (res=remove_ArvAVL(&((*raiz)->esq), valor)) == 1) {
+            if( fatorBalanceamento_NO( *raiz ) >= 2 ) {
+                if( altura_NO((*raiz)->dir->esq) <= 
+                    altura_NO((*raiz)->dir->dir) ) 
+                    RotacaoRR(raiz);
                 else
-                    ant->esq = remove_atual(atual); //Novo nó a ser apontado
+                    RotacaoRL(raiz);
             }
-            return 0;   //Elemento removido
         }
-        
-        ant = atual;
-        if( valor > atual->info )
-            atual = atual->dir;
-        else
-            atual = atual->esq;
-
-     }
-    return 1; //Não encontrou o valor a ser removido;
+    }if( valor > (*raiz)->info ){
+        if( (res=remove_ArvAVL(&((*raiz)->dir), valor)) == 1) {
+            if( fatorBalanceamento_NO( (*raiz) ) >= 2 ) {
+                if( altura_NO((*raiz)->esq->dir) <= 
+                    altura_NO((*raiz)->esq->esq) )
+                    RotacaoLL(raiz);
+                else
+                    RotacaoLR(raiz);
+            }
+        }
+    }if( valor == (*raiz)->info ){
+        if(( (*raiz)->esq == NULL || (*raiz)->dir == NULL )){
+            struct NO *oldNode = (*raiz);
+            if( (*raiz)->esq != NULL )
+                *raiz = (*raiz)->esq;
+            else
+                *raiz = (*raiz)->dir;
+            free(oldNode);
+        }else{
+            struct NO* temp = procuraMenor((*raiz)->dir);
+            (*raiz)->info = temp->info;
+            remove_ArvAVL(&(*raiz)->dir, (*raiz)->info);
+            if( fatorBalanceamento_NO(*raiz) >= 2 ){
+                if( altura_NO((*raiz)->esq->dir) <=
+                    altura_NO((*raiz)->esq->esq) )
+                    RotacaoLL(raiz);
+                else
+                    RotacaoLR(raiz);
+            }
+        }
+        return 0;
+    }
+    return res;
 }
 
 /*
-Remove o nó atual
+#Procura pelo menor no
+*/
+struct NO* procuraMenor( struct NO* atual ){
+    struct NO *no1 = atual;
+    struct NO *no2 = atual->esq;
+    while( no2 != NULL ){
+        no1 = no2;
+        no2 = no2->esq;
+    }
+    return no1;
+}
+
+/*
+#Remove o nó atual
 */
 struct NO* remove_atual( struct NO* atual ){
 

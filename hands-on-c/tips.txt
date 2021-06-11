@@ -1,0 +1,14 @@
+Ponteiros:
+
+int *p          // Declaração de um ponteiro para um tipo;
+int* p          // Outra forma de escrever a declaração;
+p               // Endereço de memoria que a varial guarda;
+*p              // Valor do Endereço de memoria;
+(*p)            // Dereferenciando o ponteiro antes de alguma operação;
+int **q         // Ponteiro para um outro pontiero de um tipo;
+struct reg *p   // Ponteiro para uma struct;
+struct reg* p   // Outra forma de declarar ponteiro para uma struct;
+(*preg).info   // Acessar membro da struc de um ponteiro para struct;
+preg->info      // Acessar membro da struc de um ponteiro para struct;
+&((*reg)->info) // Acessar o endereço do membro de um ponteiro para struct;
+->              // É usado apenas para acessar a struct por um ponteiro;

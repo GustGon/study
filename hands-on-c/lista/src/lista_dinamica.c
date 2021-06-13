@@ -1,20 +1,20 @@
 #include "lista_sequencial.h"
 
-struct lista{
-    int qtd;
-    struct aluno dados[MAX];
+struct elemento{
+    struct aluno dados; // Tipo do elemento a ser guardado
+    struct elemento *prox;
 };
-
+typedef struct elemento Elem;   
 
 /*
 # Inicia a Lista
 */
 Lista* cria_lista(){
-    Lista *li;
-    li = (Lista*) malloc(sizeof( struct lista ));
+    Lista* li;
+    li = (Lista*) malloc(sizeof( Lista ));
 
     if( li != NULL )
-        li->qtd = 0;
+        *li = NULL;
     
     return li;
 }
@@ -23,7 +23,15 @@ Lista* cria_lista(){
 # Libera a memora alocada da lista
 */
 void libera_lista(Lista* li){
-    free(li);
+    if( li != NULL ){
+        Elem* no;
+        while( (*li) != NULL ){
+            no = *li;
+            *li = (*li)->prox;
+            free(no);
+        }
+        free(li);
+    }
 }
 
 /*
@@ -32,18 +40,19 @@ void libera_lista(Lista* li){
 int tamanho_lista(Lista* li){
     if( li == NULL )
         return -1;  //Lista nao existente
-    else
-        return li->qtd;
+    int cont = 0;
+    Elem* no = *li;
+    while( no != NULL ){
+        count++;
+        no = no->prox;
+    }
 }
 
 /*
 # Lista cheia ou nao
 */
 int lista_cheia(Lista* li){
-    if( li == NULL )
-        return -1;  //Lista nao existente
-    else
-        return (li->qtd == MAX);
+    return 0;  //Lista nao fica cheia
 }
 
 /*
@@ -52,8 +61,10 @@ int lista_cheia(Lista* li){
 int lista_vazia(Lista* li){
     if( li == NULL )
         return -1;  //Lista nao existente
-    else
-        return (li->qtd == 0);
+    if( *li == NULL )
+        return 1;   // Lista esta vazia
+    elsel
+        return 0;   // Lista nao esta vazia
 }
 
 /*
@@ -201,7 +212,7 @@ int consulta_lista_mat(Lista* li, int mat, struct aluno *al){
 */
 int main(){
 
-    Lista *li;
+    Lista *li; // Ponteiro para ponteiro para struct elemento (inicio da lista
 
     printf("Criando a lista...\n");
     li = cria_lista();

@@ -1,4 +1,4 @@
-#include "lista_sequencial.h"
+#include "lista_dinamica.h"
 
 struct elemento{
     struct aluno dados; // Tipo do elemento a ser guardado
@@ -43,9 +43,10 @@ int tamanho_lista(Lista* li){
     int cont = 0;
     Elem* no = *li;
     while( no != NULL ){
-        count++;
+        cont++;
         no = no->prox;
     }
+    return cont;
 }
 
 /*
@@ -63,7 +64,7 @@ int lista_vazia(Lista* li){
         return -1;  //Lista nao existente
     if( *li == NULL )
         return 1;   // Lista esta vazia
-    elsel
+    else
         return 0;   // Lista nao esta vazia
 }
 
@@ -73,10 +74,23 @@ int lista_vazia(Lista* li){
 int insere_lista_final(Lista* li, struct aluno al){
     if( li == NULL )
         return -1;  //Lista nao existente
-    if( lista_cheia(li) )
-        return 1;
-    li->dados[li->qtd] = al;
-    li->qtd++;
+    
+    Elem* no = (Elem*) malloc(sizeof( Elem ));
+    if( no == NULL )
+        return 1;  // Sem espaço para alocação da memoria
+
+    no->dados = al;
+    no->prox = NULL;
+
+    if( lista_vazia( li ) )
+        *li = no;
+    else{
+        Elem *aux = *li;
+        while( aux->prox != NULL ){  // Percorrendo toda a lista
+            aux = aux->prox;
+        }
+        aux->prox = no;
+    }
 
     return 0;
 }
@@ -87,15 +101,16 @@ int insere_lista_final(Lista* li, struct aluno al){
 int insere_lista_inicio(Lista* li, struct aluno al){
     if( li == NULL )
         return -1;  //Lista nao existente
-    if( lista_cheia(li) )
-        return 1;
     
-    int i;
-    for( i = li->qtd-1; i >= 0; i-- )
-        li->dados[i + 1] = li->dados[i];
-    li->dados[0] = al;
-    li->qtd++;
+    Elem* no = (Elem*) malloc(sizeof( Elem ));
+    
+    if( no == NULL )
+        return 1;  // Sem espaço para proximo elemento
 
+    no->dados = al;
+    no->prox = (*li);
+
+    *li = no;
     return 0;
 }
 
@@ -105,17 +120,31 @@ int insere_lista_inicio(Lista* li, struct aluno al){
 int insere_lista_ordenada(Lista* li, struct aluno al){
     if( li == NULL )
         return -1;  //Lista nao existente
-    if( lista_cheia(li) )
-        return 1;
     
-    int k, i = 0;
-    while( i < li->qtd && li->dados[i].matricula < al.matricula )
-        i++;
+    Elem *no = (Elem*) malloc(sizeof( Elem ));
+    if( no == NULL )
+        return 1;
 
-    for( k = li->qtd-1; k >= i; k-- )
-        li->dados[k + 1] = li->dados[k];
-    li->dados[0] = al;
-    li->qtd++;
+    no->dados = al;
+    if( lista_vazia(li) ){
+        free(no);
+        insere_lista_inicio( li, al);
+    }else{
+        Elem *ant, *atual = *li;
+        while( atual != NULL && 
+               atual->dados.matricula < al.matricula ){
+            ant = atual;
+            atual = atual->prox;
+        }
+
+        if( atual == *li ){
+            free(no);
+            insere_lista_inicio( li, al);
+        }else{
+            no->prox = ant->prox;
+            ant->prox = no;
+        }
+    }
 
     return 0;
 }
@@ -127,13 +156,11 @@ int remove_lista_inicio(Lista* li){
     if( li == NULL )
         return -1;  //Lista nao existente
     if( lista_vazia(li) )
-        return 1;
+        return 1; // Nao tem oq remover
     
-    int k;
-
-    for( k = 0; k < li->qtd; k++ )
-        li->dados[k] = li->dados[k + 1];
-    li->qtd--;
+    Elem *no = *li;
+    *li = no->prox;
+    free(no);
 
     return 0;
 }
@@ -147,7 +174,17 @@ int remove_lista_final(Lista* li){
     if( lista_vazia(li) ) 
         return 1;
     
-    li->qtd--;
+    Elem *ant, *no = *li;
+    while( no->prox != NULL ){
+        ant = no;
+        no = no->prox;
+    }
+    if( no == (*li) )
+        *li = no->prox;
+    else
+        ant->prox = no->prox;
+    
+    free(no);
 
     return 0;
 }
@@ -161,17 +198,21 @@ int remove_lista(Lista* li, int mat){
     if( lista_vazia(li) )
         return 1;
     
-    int k, i = 0;
-    while( i < li->qtd && li->dados[i].matricula != mat )
-        i++;
+    Elem *ant, *no = *li;
+    while( no != NULL &&
+           no->dados.matricula != mat ){
+        ant = no;
+        no = no->prox;
+    }
 
-    if( i == li->qtd )
-        return 1;  //Nao existe essa matricula
+    if( no == NULL )
+        return 1;  // dado nao encontrado
+    if( no == *li )
+        *li = no->prox;
+    else
+        ant = no->prox;
 
-    for( k = i; k > li->qtd - 1; k++ )
-        li->dados[k] = li->dados[k+1];
-    
-    li->qtd--;
+    free(no);
 
     return 0;
 }
@@ -180,10 +221,19 @@ int remove_lista(Lista* li, int mat){
 # Consulta a lista por posição
 */
 int consulta_lista_pos(Lista* li, int pos, struct aluno *al){
-    if( li == NULL || pos < 0 || pos > li->qtd )
+    if( li == NULL || pos < 0 )
         return -1;
     
-    *al = li->dados[pos-1];
+    Elem *no = *li;
+    int i = 1;
+    while( no != NULL && i < pos ){
+        no = no->prox;
+        i++;
+    }
+    if( no == NULL )
+        return 1; // Lista esta vazia
+    else
+        *al = no->dados;
 
     return 0;
 }
@@ -194,15 +244,15 @@ int consulta_lista_pos(Lista* li, int pos, struct aluno *al){
 int consulta_lista_mat(Lista* li, int mat, struct aluno *al){
     if( li == NULL )
         return -1;
-   
-   int k, i = 0;
-    while( i < li->qtd && li->dados[i].matricula != mat )
-        i++;
+    
+    Elem *no = *li;   
+    while( no != NULL && no->dados.matricula != mat )
+        no = no->prox;
 
-    if( i == li->qtd )
+    if( no == NULL )
         return 1;  //Nao existe essa matricula
 
-    *al = li->dados[i];
+    *al = no->dados;
 
     return 0;
 }
@@ -235,11 +285,11 @@ int main(){
     printf("ret: %i\n", ret);
     
     printf("Inserindo aluno novo no final da lista...");
-    ret = insere_lista_final(li, al1);
+    ret = insere_lista_final(li, al2);
     printf("ret: %i\n", ret);
     
     printf("Inserindo aluno novo no final da lista...");
-    ret = insere_lista_final(li, al1);
+    ret = insere_lista_final(li, al3);
     printf("ret: %i\n", ret);
     
     printf("Inserindo aluno novo no meio da lista...");
@@ -247,12 +297,12 @@ int main(){
     printf("ret: %i\n", ret);
     
     printf("Inserindo aluno novo no inicio da lista...");
-    ret = insere_lista_inicio(li, al1);
+    ret = insere_lista_inicio(li, al2);
     printf("ret: %i\n", ret);
     
     int i;
     printf("Verificando a lista por posição...\n");
-    for( i = 1; i < li->qtd; i++ ){
+    for( i = 1; i < tamanho_lista(li); i++ ){
         consulta_lista_pos(li, i, &al);
         printf("%i",al.matricula);
     }

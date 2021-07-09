@@ -162,9 +162,13 @@ int remove_lista_inicio(Lista* li){
     if( lista_vazia(li) )
         return 1; // Nao tem oq remover
     
-    Elem *no = *li;
-    *li = no->prox;
+    Elem *no = li->inicio;
+    li->inicio = no->prox;
     free(no);
+
+    if (li->inicio == NULL)
+        li->final = NULL;
+    li->qtd--;
 
     return 0;
 }
@@ -183,12 +187,16 @@ int remove_lista_final(Lista* li){
         ant = no;
         no = no->prox;
     }
-    if( no == (*li) )
-        *li = no->prox;
-    else
+    if( no == li->inicio ){
+        li->inicio = no->prox;
+        li->final = NULL;
+    }else{
         ant->prox = no->prox;
-    
+        li->final = ant;
+    }
+
     free(no);
+    li-qtd--;
 
     return 0;
 }

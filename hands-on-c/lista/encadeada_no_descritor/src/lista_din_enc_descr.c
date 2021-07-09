@@ -1,4 +1,4 @@
-#include "lista_dinamica.h"
+#include "lista_din_enc_descr.h"
 
 struct elemento{
     struct aluno dados; // Tipo do elemento a ser guardado
@@ -10,18 +10,18 @@ struct descritor{
     struct elemento *inicio;
     struct elemento *final;
     int qtd;
-}
+};
 
 /*
 # Inicia a Lista
 */
 Lista* cria_lista(){
-    Lista* li;
+    Lista *li;
     li = (Lista*) malloc(sizeof( Lista ));
 
     if( li != NULL ){
         li->inicio = NULL;
-        li-> = NULL;
+        li->final = NULL;
         li->qtd = 0;
     }
     
@@ -91,7 +91,7 @@ int insere_lista_final(Lista* li, struct aluno al){
         li->final->prox = no;
 
     li->final = no;
-    li->qtd++
+    li->qtd++;
 
     return 0;
 }
@@ -134,14 +134,14 @@ int insere_lista_ordenada(Lista* li, struct aluno al){
         free(no);
         insere_lista_inicio( li, al);
     }else{
-        Elem *ant, *atual = *li;
+        Elem *ant, *atual = li->inicio;
         while( atual != NULL && 
                atual->dados.matricula < al.matricula ){
             ant = atual;
             atual = atual->prox;
         }
 
-        if( atual == *li ){
+        if( atual == li->inicio ){
             free(no);
             insere_lista_inicio( li, al);
         }else{
@@ -182,7 +182,7 @@ int remove_lista_final(Lista* li){
     if( lista_vazia(li) ) 
         return 1;
     
-    Elem *ant, *no = *li;
+    Elem *ant, *no = li->inicio;
     while( no->prox != NULL ){
         ant = no;
         no = no->prox;
@@ -196,7 +196,7 @@ int remove_lista_final(Lista* li){
     }
 
     free(no);
-    li-qtd--;
+    li->qtd--;
 
     return 0;
 }
@@ -210,7 +210,7 @@ int remove_lista(Lista* li, int mat){
     if( lista_vazia(li) )
         return 1;
     
-    Elem *ant, *no = *li;
+    Elem *ant, *no = li->inicio;
     while( no != NULL &&
            no->dados.matricula != mat ){
         ant = no;
@@ -219,8 +219,8 @@ int remove_lista(Lista* li, int mat){
 
     if( no == NULL )
         return 1;  // dado nao encontrado
-    if( no == *li )
-        *li = no->prox;
+    if( no == li->inicio )
+        li->inicio = no->prox;
     else
         ant = no->prox;
 
@@ -236,7 +236,7 @@ int consulta_lista_pos(Lista* li, int pos, struct aluno *al){
     if( li == NULL || pos < 0 )
         return -1;
     
-    Elem *no = *li;
+    Elem *no = li->inicio;
     int i = 1;
     while( no != NULL && i < pos ){
         no = no->prox;
@@ -257,7 +257,7 @@ int consulta_lista_mat(Lista* li, int mat, struct aluno *al){
     if( li == NULL )
         return -1;
     
-    Elem *no = *li;   
+    Elem *no = li->inicio;
     while( no != NULL && no->dados.matricula != mat )
         no = no->prox;
 

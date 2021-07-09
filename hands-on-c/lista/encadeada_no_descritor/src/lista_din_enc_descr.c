@@ -65,7 +65,7 @@ int lista_cheia(Lista* li){
 int lista_vazia(Lista* li){
     if( li == NULL )
         return -1;  //Lista nao existente
-    if( *li == NULL )
+    if( li->inicio == NULL )
         return 1;   // Lista esta vazia
     else
         return 0;   // Lista nao esta vazia
@@ -86,14 +86,12 @@ int insere_lista_final(Lista* li, struct aluno al){
     no->prox = NULL;
 
     if( lista_vazia( li ) )
-        *li = no;
-    else{
-        Elem *aux = *li;
-        while( aux->prox != NULL ){  // Percorrendo toda a lista
-            aux = aux->prox;
-        }
-        aux->prox = no;
-    }
+        li->inicio = no;
+    else
+        li->final->prox = no;
+
+    li->final = no;
+    li->qtd++
 
     return 0;
 }

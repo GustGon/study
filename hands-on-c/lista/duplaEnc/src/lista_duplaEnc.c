@@ -170,6 +170,9 @@ int remove_lista_inicio(Lista* li){
     
     Elem *no = *li;
     *li = no->prox;
+    if( no->prox != NULL )
+        no->prox->ant = NULL;
+
     free(no);
 
     return 0;
@@ -185,14 +188,13 @@ int remove_lista_final(Lista* li){
         return 1;
     
     Elem *ant, *no = *li;
-    while( no->prox != NULL ){
-        ant = no;
+    while( no->prox != NULL )
         no = no->prox;
-    }
-    if( no == (*li) )
+
+    if( no->ant == NULL )
         *li = no->prox;
     else
-        ant->prox = no->prox;
+        no->ant->prox = NULL;
     
     free(no);
 
@@ -208,19 +210,22 @@ int remove_lista(Lista* li, int mat){
     if( lista_vazia(li) )
         return 1;
     
-    Elem *ant, *no = *li;
+    Elem *no = *li;
     while( no != NULL &&
            no->dados.matricula != mat ){
-        ant = no;
         no = no->prox;
     }
 
     if( no == NULL )
         return 1;  // dado nao encontrado
-    if( no == *li )
-        *li = no->prox;
-    else
-        ant = no->prox;
+    if( no->ant == NULL ){   // remove o primeiro?
+        remove_lista_inicio(li);
+        return 0;
+    }else
+        no->ant->prox = no->prox;
+
+    if( no->prox != NULL )  // nao eh o ultimo elemento
+        no->prox->ant = no->ant;
 
     free(no);
 

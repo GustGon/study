@@ -151,7 +151,7 @@ int insere_lista_ordenada(Lista* li, struct aluno al){
             no->ant = ant;
             no->prox = ant->prox;
             ant->prox = no;
-            if( autal != NULL )
+            uif( atual != NULL )
                 atual->ant = no;
         }
     }

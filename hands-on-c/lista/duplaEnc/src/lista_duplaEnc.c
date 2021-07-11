@@ -1,6 +1,7 @@
-#include "lista_dinamica.h"
+#include "lista_duplaEnc.h"
 
 struct elemento{
+    struct elemento *ant;
     struct aluno dados; // Tipo do elemento a ser guardado
     struct elemento *prox;
 };
@@ -82,14 +83,16 @@ int insere_lista_final(Lista* li, struct aluno al){
     no->dados = al;
     no->prox = NULL;
 
-    if( lista_vazia( li ) )
+    if( lista_vazia( li ) ){
+        no->ant = NULL;
         *li = no;
-    else{
+    }else{
         Elem *aux = *li;
         while( aux->prox != NULL ){  // Percorrendo toda a lista
             aux = aux->prox;
         }
         aux->prox = no;
+        no->ant = aux;
     }
 
     return 0;
@@ -109,6 +112,10 @@ int insere_lista_inicio(Lista* li, struct aluno al){
 
     no->dados = al;
     no->prox = (*li);
+    no->ant = NULL;
+
+    if( *li != NULL )
+        (*li)->ant = no;
 
     *li = no;
     return 0;
@@ -141,8 +148,11 @@ int insere_lista_ordenada(Lista* li, struct aluno al){
             free(no);
             insere_lista_inicio( li, al);
         }else{
+            no->ant = ant;
             no->prox = ant->prox;
             ant->prox = no;
+            if( autal != NULL )
+                atual->ant = no;
         }
     }
 

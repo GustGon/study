@@ -80,16 +80,16 @@ int insere_lista_final(Lista* li, struct aluno al){
         return 1;  // Sem espaço para alocação da memoria
 
     no->dados = al;
-    no->prox = NULL;
 
-    if( lista_vazia( li ) )
+    if( lista_vazia( li ) ){
         *li = no;
-    else{
+        no->prox = no;
+    }else{
         Elem *aux = *li;
-        while( aux->prox != NULL ){  // Percorrendo toda a lista
+        while( aux->prox != NULL )  // Percorrendo toda a lista
             aux = aux->prox;
-        }
         aux->prox = no;
+        no->prox = *li;
     }
 
     return 0;
@@ -108,9 +108,17 @@ int insere_lista_inicio(Lista* li, struct aluno al){
         return 1;  // Sem espaço para proximo elemento
 
     no->dados = al;
-    no->prox = (*li);
-
-    *li = no;
+    if((*li) == NULL){
+        *li = no;
+        no->prox = no;
+    }else{
+        Elem *aux = *li;
+        while(aux->prox != (*li))
+            aux = aux->prox;
+        aux->prox = no;
+        no->prox = *li;
+        *li = no;
+    }
     return 0;
 }
 
@@ -126,24 +134,19 @@ int insere_lista_ordenada(Lista* li, struct aluno al){
         return 1;
 
     no->dados = al;
-    if( lista_vazia(li) ){
+    if( lista_vazia(li) 
+            || ( (*li)->dados.amtricula > al.matricula ) ){
         free(no);
         insere_lista_inicio( li, al);
     }else{
         Elem *ant, *atual = *li;
-        while( atual != NULL && 
+        while( atual != (*li) && 
                atual->dados.matricula < al.matricula ){
             ant = atual;
             atual = atual->prox;
         }
-
-        if( atual == *li ){
-            free(no);
-            insere_lista_inicio( li, al);
-        }else{
-            no->prox = ant->prox;
-            ant->prox = no;
-        }
+        ant->prox = no;
+        no->prox = atual;
     }
 
     return 0;

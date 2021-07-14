@@ -1,4 +1,4 @@
-#include "lista_dinamica.h"
+#include "lista_circular.h"
 
 struct elemento{
     struct aluno dados; // Tipo do elemento a ser guardado
@@ -10,8 +10,7 @@ typedef struct elemento Elem;
 # Inicia a Lista
 */
 Lista* cria_lista(){
-    Lista* li;
-    li = (Lista*) malloc(sizeof( Lista ));
+    Lista* li = (Lista*) malloc(sizeof( Lista ));
 
     if( li != NULL )
         *li = NULL;
@@ -24,12 +23,13 @@ Lista* cria_lista(){
 */
 void libera_lista(Lista* li){
     if( li != NULL ){
-        Elem* no;
-        while( (*li) != NULL ){
-            no = *li;
-            *li = (*li)->prox;
+        Elem *aux, *no = *li;
+        while( (*li) != no->prox ){
+            aux = no;
+            no = no->prox;
             free(no);
         }
+        free(no);
         free(li);
     }
 }

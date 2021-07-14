@@ -38,14 +38,14 @@ void libera_lista(Lista* li){
 # Tamanho da lista que esta preechida
 */
 int tamanho_lista(Lista* li){
-    if( li == NULL )
-        return -1;  //Lista nao existente
+    if( li == NULL || (*li) == NULL )
+        return -1;  //Lista nao existente ou vazia
     int cont = 0;
     Elem* no = *li;
-    while( no != NULL ){
+    do{
         cont++;
         no = no->prox;
-    }
+    }while( no != (*li) );
     return cont;
 }
 

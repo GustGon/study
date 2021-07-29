@@ -224,16 +224,16 @@ int remove_lista(Lista* li, int mat){
 # Consulta a lista por posição
 */
 int consulta_lista_pos(Lista* li, int pos, struct aluno *al){
-    if( li == NULL || pos < 0 )
+    if( li == NULL || (*li) == NULL || pos < 0 )
         return -1;
     
     Elem *no = *li;
     int i = 1;
-    while( no != NULL && i < pos ){
+    while( no->prox != (*li) && i < pos ){
         no = no->prox;
         i++;
     }
-    if( no == NULL )
+    if( i != pos )  // posição nao existe
         return 1; // Lista esta vazia
     else
         *al = no->dados;
@@ -249,10 +249,10 @@ int consulta_lista_mat(Lista* li, int mat, struct aluno *al){
         return -1;
     
     Elem *no = *li;   
-    while( no != NULL && no->dados.matricula != mat )
+    while( no->prox != (*li) && no->dados.matricula != mat )
         no = no->prox;
 
-    if( no == NULL )
+    if( no->dados.matricula != mat )
         return 1;  //Nao existe essa matricula
 
     *al = no->dados;

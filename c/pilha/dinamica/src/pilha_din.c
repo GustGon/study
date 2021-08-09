@@ -48,9 +48,11 @@ int Pilha_vazia(Pilha* pi){
 
 int insere_Pilha(Pilha* pi, struct aluno al){
     if( pi == NULL ) return 1;
-    if( Pilha_cheia(pi) ) return 2;
-    pi->dados[pi->qtd] = al;
-    pi->qtd++;
+    Elem* no = (Elem*) malloc(sizeof(Elem));
+    if( no == NULL ) return 2;
+    no->dados = al;
+    no->prox = (*pi);
+    *pi = no;
 
     return 0;
 }
@@ -58,7 +60,9 @@ int insere_Pilha(Pilha* pi, struct aluno al){
 int remove_Pilha(Pilha* pi){
     if( pi == NULL ) return 1;
     if( Pilha_vazia(pi) ) return 2;
-    pi->qtd++;
+    Elem *no = *pi;
+    *pi = no->prox;
+    free(no);
 
     return 0;
 }
@@ -66,7 +70,7 @@ int remove_Pilha(Pilha* pi){
 int consulta_Pilha(Pilha* pi, struct aluno *al){
     if( pi == NULL ) return 1;
     if( Pilha_vazia(pi) ) return 2;
-    *al = pi->dados[pi->qtd -1];
+    *al = (*pi)->dados;
 
     return 0;
 }

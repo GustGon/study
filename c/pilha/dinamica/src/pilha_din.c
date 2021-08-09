@@ -26,22 +26,24 @@ void libera_Pilha(Pilha* pi){
 }
 
 int tamanho_Pilha(Pilha* pi){
-    if(pi == NULL)
-        return -1;
-    else
-        return pi->qtd;
+    if(pi == NULL)  return -1;
+    int cont = 0;
+    Elem* no = *pi;
+    while( no != NULL ){
+        cont++;
+        no = no->prox;
+    }
+    return cont;
 }
 
 int Pilha_cheia(Pilha* pi){
-    if(pi == NULL)
-        return -1;
-    return (pi->qtd == MAX);
+    return 0;
 }
 
 int Pilha_vazia(Pilha* pi){
-    if( pi == NULL )
-        return -1;
-    return (pi->qtd == 0);
+    if( pi == NULL ) return -1;
+    if( *pi == NULL ) return 1;
+    return 0;
 }
 
 int insere_Pilha(Pilha* pi, struct aluno al){

@@ -19,9 +19,9 @@ void libera_Pilha(Pilha* pi){
         while( (*pi) != NULL ){
             no = *pi;
             *pi = (*pi)->prox;
-            free(no)
+            free(no);
         }
-        free(pi)
+        free(pi);
     }
 }
 

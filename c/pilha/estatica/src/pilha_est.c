@@ -36,6 +36,31 @@ int Pilha_vazia(Pilha* pi){
     return (pi->qtd == 0);
 }
 
+int insere_Pilha(Pilha* pi, struct aluno al){
+    if( pi == NULL ) return 1;
+    if( Pilha_cheia(pi) ) return 2;
+    pi->dados[pi->qtd] = al;
+    pi->qtd++;
+
+    return 0;
+}
+
+int remove_Pilha(Pilha* pi){
+    if( pi == NULL ) return 1;
+    if( Pilha_vazia(pi) ) return 2;
+    pi->qtd++;
+
+    return 0;
+}
+
+int consulta_Pilha(Pilha* pi, struct aluno *al){
+    if( pi == NULL ) return 1;
+    if( Pilha_vazia(pi) ) return 2;
+    *al = pi->dados[pi->qtd -1];
+
+    return 0;
+}
+
 int main(){
     Pilha *pi;
 

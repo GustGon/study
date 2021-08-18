@@ -125,6 +125,102 @@ void buscaProfundidade_Grafo(Grafo *gr, int ini, int *visitado){
     buscaProfundidade(gr, ini, visitado, cont);
 }
 
+// Funçao principal: faz a interface com o usuario
+void buscaLargura_Grafo(Grafo *gr, int ini, int *visitado){
+    int i, vert, NV, cont = 1, *fila, IF = 0, FF = 0;
+    
+    // Marca vertices como nao visitados
+    for(i = 0; i < gr->nro_vertices; i++)
+        visitado[i] = 0;
+
+    // Cria fila. Visita e insere "ini" na fila
+    NV = gr->nro_vertices;
+    fila = (int*) malloc( NV * sizeof(int) );
+    FF++;
+    fila[FF] = ini;
+    visitado[ini] = cont;
+
+    while( IF != FF){
+        
+        // Pega o primeiro da fila
+        IF = ( IF + 1 ) % NV;
+        vert = fila[IF];
+        cont++;
+        
+        // Visita os vizinhos ainda nao visitados
+        // e coloca na fila
+        for(i = 0; i < gr->grau[vert]; i++){
+            if( !visitado[gr->arestas[vert][i]] ){
+                FF = (FF + 1) % NV;
+                fila[FF] = gr->arestas[vert][i];
+                visitado[gr->arestas[vert][i]] = cont;
+            }
+        }
+    }
+    free(fila);
+}
+
+// Função auxiliar: realiza o calculo
+int procuraMenorDistancia(float *dist, int *visitado, int NV){
+    int i, menor = -1, primeiro = 1;
+    for(i = 0; i < NV; i++){
+        // Procura vertice com a menor distancia q nao tenha sido visitado
+        if( dist[i] >= 0 && visitado[i] == 0 ){
+            if( primeiro ){
+                menor = i;
+                primeiro = 0;
+            }else{
+                if( dist[menor] > dist[i] )
+                    menor = i;
+            }
+        }
+    }
+    return menor;
+}
+
+// Funçao principal: faz a interface com o usuario
+void menorCaminho_Grafo(Grafo *gr, int ini, int *ant, float *dist){
+    int i, cont, NV, ind, *visitado, u;
+    cont = NV = gr->nro_vertices;
+    // Cria vetor auxiliar. Inicializa distâncias e anteriores
+    visitado = (int*) malloc(NV * sizeof(int));
+    for( i = 0; i < NV; i++ ){
+        ant[i] = -1;
+        dist[i] = -1;
+        visitado[i] = 0;
+    }
+    dist[ini] = 0;
+    while( cont > 0 ){
+        // Procura o vertice com menor distancia e marca como visitado
+        u = procuraMenorDistancia(dist, visitado, NV);
+        if( u == -1 )
+            break;
+
+        visitado[u] = 1;
+        cont--;
+        for( i = 0; i < gr->grau[u]; i ++ ){ // Para cada vertice visinho
+            ind = gr->arestas[u][i];
+            // Atualiza distancia dos visinhos
+            if( dist[ind] < 0 ){
+                dist[ind] = dist[u] + 1;
+                //ou  peso da aresta
+                //dist[ind] = dist[u] + gr->pesos[u][i]
+                ant[ind] = u;
+            }else{
+                if( dist[ind] > dist[u] + 1 ){
+                //if(dist[ind] > dist[u]+1){ ou peso da arest;
+                    dist[ind] = dist[u] + 1 ;
+                    //ou peso da aresta
+                    //dist[ind] = dist[u]+gr->pesos[u][i];
+                    ant[ind] = u;
+                }
+            }
+        }
+    }
+    free(visitado);
+}
+
+
 int main( ){
     int eh_digrafo = 1;
 
@@ -141,6 +237,13 @@ int main( ){
     int vis[5];
 
     buscaProfundidade_Grafo(gr, 0, vis);
+
+    buscaLargura_Grafo(gr, 0, vis);
+
+    int ant[5];
+    float dist[5];
+
+    //menorCaminho_Grafo(gr, 0, ant, dist);
 
     libera_Grafo(gr);
 
